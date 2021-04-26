@@ -1,3 +1,30 @@
+<script>
+
+    function sendData(event) {
+        event.preventDefault();
+        const protocol = window.location.protocol
+        const host = window.location.host; 
+        const url_string = window.location.href
+        const url = new URL(url_string);
+
+        const item =  {
+            price: url.searchParams.get("price"),
+            title: url.searchParams.get("title"),
+            unit: url.searchParams.get("unit")
+        }
+
+        axios.post(`${protocol}//${host}/checkout`,item)
+            .then(function(res) { 
+                 if(res.status === 200){
+                 window.location.replace(res.data.init_point); 
+                 }
+            })
+            .catch(function(err) {
+                console.error(err);
+            });
+    }
+</script>
+
 
 <div class="as-search-wrapper" role="main">
     <div class="as-navtuck-wrapper">
@@ -84,7 +111,9 @@
                                     {{ unit }}
                                 </h3>
                             </div>
-                            <button type="submit" class="mercadopago-button" formmethod="post">Pagar</button>
+                            <form onsubmit="sendData(event);">
+                                <button type="submit" class="mercadopago-button" formmethod="post">Pagar</button>
+                            </form>
                         </div>
                     </div>
                 </div>
