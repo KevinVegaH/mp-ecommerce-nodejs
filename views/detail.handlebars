@@ -16,7 +16,7 @@
         axios.post(`${protocol}//${host}/checkout`,item)
             .then(function(res) { 
                  if(res.status === 200){
-                 window.location.replace(res.data.init_point); 
+                    window.location.replace(res.data.init_point); 
                  }
             })
             .catch(function(err) {
