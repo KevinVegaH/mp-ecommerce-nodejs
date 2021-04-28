@@ -1,3 +1,4 @@
+if (process.env.NODE_ENV !== 'production') require('dotenv').config();
 const express = require('express');
 const exphbs = require('express-handlebars');
 const mercadopago = require('mercadopago'); // SDK
@@ -7,9 +8,8 @@ const port = process.env.PORT || 3000;
 const app = express();
 
 mercadopago.configure({
-  integrator_id: 'dev_24c65fb163bf11ea96500242ac130004',
-  access_token:
-    'APP_USR-2572771298846850-120119-a50dbddca35ac9b7e15118d47b111b5a-681067803', // seller
+  integrator_id: process.env.INTEGRATOR_ID,
+  access_token: process.env.ACCESS_TOKEN, // seller
 });
 
 app.use(express.json()); // parses application/json
@@ -30,9 +30,25 @@ app.get('/detail', function (req, res) {
   res.render('detail', req.query);
 });
 
+app.get('/success', function (req, res) {
+  res.render('success', req.query);
+});
+
+app.get('/rejected', function (req, res) {
+  res.render('rejected', req.query);
+});
+
+app.get('/pending', function (req, res) {
+  res.render('pending', req.query);
+});
+
 app.post('/checkout', async (req, res) => {
   try {
     const { title, price, unit } = req.body;
+
+    const HOST = req.get('host');
+    const protocol =
+      process.env.NODE_ENV === 'production' ? 'https://' : 'http://';
 
     let preference = {
       items: [
@@ -46,11 +62,6 @@ app.post('/checkout', async (req, res) => {
         },
       ],
       external_reference: 'kevin.vega.h@hotmail.com',
-      back_urls: {
-        success: 'http://localhost:3000/feedback',
-        failure: 'http://localhost:3000/feedback',
-        pending: 'http://localhost:3000/feedback',
-      },
       payer: {
         name: 'Lalo',
         surname: 'Landa',
@@ -65,11 +76,18 @@ app.post('/checkout', async (req, res) => {
           street_number: parseInt('1602'),
         },
       },
-      excluded_payment_methods: [{ id: 'amex' }],
-      excluded_payment_types: [{ id: 'atm' }],
-      installments: 6,
-      default_installments: 6,
-      notification_url: 'http://localhost:3000/webhook',
+      payment_methods: {
+        excluded_payment_methods: [{ id: 'amex' }],
+        excluded_payment_types: [{ id: 'atm' }],
+        installments: 6,
+        default_installments: 6,
+      },
+      notification_url: `${protocol}${HOST}/webhook`,
+      back_urls: {
+        success: `${protocol}${HOST}/success`,
+        failure: `${protocol}${HOST}/pending`,
+        pending: `${protocol}${HOST}/rejected`,
+      },
       auto_return: 'approved',
     };
     const response = await mercadopago.preferences.create(preference);
@@ -94,16 +112,7 @@ app.get('/feedback', (req, res) => {
 });
 
 app.get('/webhook', (req, res) => {
-  if (req.method === 'POST') {
-    let body = '';
-    req.on('data', (chunk) => {
-      body += chunk.toString();
-    });
-    req.on('end', () => {
-      console.log(body, 'webhook response');
-      res.end('ok');
-    });
-  }
+  console.log(req.body);
   return res.status(200);
 });
 

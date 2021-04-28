@@ -1,0 +1,59 @@
+<script src="https://www.mercadopago.com/v2/security.js" view="success"></script>
+
+<div class="as-search-wrapper" role="main">
+     <div class="as-navtuck-wrapper">
+        <div class="as-l-fullwidth  as-navtuck" data-events="event52">
+            <div>
+                <div class="pd-billboard pd-category-header">
+                    <div class="pd-l-plate-scale">
+                        <div class="pd-billboard-background">
+                            <img src="./assets/music-audio-alp-201709" alt="" width="1440" height="320" data-scale-params-2="wid=2880&amp;hei=640&amp;fmt=jpeg&amp;qlt=95&amp;op_usm=0.5,0.5&amp;.v=1503948581306" class="pd-billboard-hero ir">
+                        </div>
+                        <div class="pd-billboard-info">
+                            <h1 class="pd-billboard-header pd-util-compact-small-18">Tienda e-commerce</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="success-msg">
+        <i class="fa fa-check"></i>
+            El pago haya sido exitoso!
+        </div>
+
+        <div style="border: 1px black solid; width:400px; height:200px; margin:auto; margin-top: 80px; display:flex; justify-content:center; align-items:center; flex-direction: column;">
+            <h4>Payment type:</h4>
+            <span id="paymentType" style="margin:0px; margin-bottom: 10px; "></span>
+            <h4>External reference:</h4>
+             <span id="externalReference" style="margin:0px; margin-bottom: 10px; "></span>
+            <h4>Payment Id:</h4>
+             <span id="paymentId" style="margin:0px; margin-bottom: 10px; "></span>
+        </div>
+        <div style="display:flex; justify-content:center; margin-top:10px">
+            <a href="/" class="mercadopago-button">Ir al comercio</a>
+        </div>   
+    </div>
+</div>
+
+<script>
+
+    function getData() {
+        const protocol = window.location.protocol
+        const host = window.location.host; 
+        const url_string = window.location.href
+        const url = new URL(url_string);
+
+        return {
+            payment_type: url.searchParams.get("payment_type"),
+            external_reference: url.searchParams.get("external_reference"),
+            payment_id: url.searchParams.get("payment_id")
+        }
+    }
+    const {payment_type,external_reference,payment_id} = getData();
+    document.getElementById("paymentType").innerHTML  = payment_type;
+    document.getElementById("externalReference").innerHTML  = external_reference;
+    document.getElementById("paymentId").innerHTML  = payment_id;
+
+</script>
